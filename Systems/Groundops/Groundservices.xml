@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PropertyList>
+
+  <!-- Disable ASU hoses when ASU not enabled -->
+
+    <logic>
+        <name>ASU1</name>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <enable>
+            <condition>
+                <equals>
+                    <property>services/ASU/enable</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+        <input><false/></input>
+        <output>
+            <property>services/ASU/hose1-enable</property>
+        </output>
+    </logic>
+    
+    <logic>
+        <name>ASU2</name>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <enable>
+            <condition>
+                <equals>
+                    <property>services/ASU/enable</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+        <input><false/></input>
+        <output>
+            <property>services/ASU/hose2-enable</property>
+        </output>
+    </logic>
+	
+	<logic>
+		<name>Nosegear chocks WOW</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<enable>
+            <condition>
+                <equals>
+                    <property>gear/gear[0]/wow</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+		<input><false/></input>
+		<output><property>controls/gear/brake-chock-Nose</property></output>
+	</logic>
+	
+	<logic>
+		<name>Left Gear chocks WOW</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<enable>
+            <condition>
+                <equals>
+                    <property>gear/gear[1]/wow</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+		<input><false/></input>
+		<output><property>controls/gear/brake-chock-L</property></output>
+	</logic>
+	
+	<logic>
+		<name>Right Gear chocks WOW</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<enable>
+            <condition>
+                <equals>
+                    <property>gear/gear[2]/wow</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+		<input><false/></input>
+		<output><property>controls/gear/brake-chock-R</property></output>
+	</logic>
+	
+	<logic>
+		<name>Nosegear chocks</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<input><property>services/chocks/nose</property></input>
+		<output><property>controls/gear/brake-chock-Nose</property></output>
+	</logic>
+	<logic>
+		<name>Left gear chocks</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<input><property>services/chocks/left</property></input>
+		<output><property>controls/gear/brake-chock-L</property></output>
+	</logic>
+	<logic>
+		<name>Right gear chocks</name>
+		<update-interval-secs type="double">0.05</update-interval-secs>
+		<input><property>services/chocks/right</property></input>
+		<output><property>controls/gear/brake-chock-R</property></output>
+	</logic>
+	
+	<logic>
+        <name>GrdPwr1</name>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <enable>
+            <condition>
+                <equals>
+                    <property>services/ext-pwr/enable</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+        <input><false/></input>
+        <output>
+            <property>services/ext-pwr/primary</property>
+        </output>
+    </logic>
+	
+	<logic>
+        <name>GrdPwr2</name>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <enable>
+            <condition>
+                <equals>
+                    <property>services/ext-pwr/enable</property>
+                    <value><false/></value>
+                </equals>
+            </condition>
+        </enable>
+        <input><false/></input>
+        <output>
+            <property>services/ext-pwr/secondary</property>
+        </output>
+    </logic>
+	
+	<filter>
+        <name>GrndPwr1-system</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <input>
+			<condition>
+				<property>services/ext-pwr/enable</property>
+            </condition>
+			<property>services/ext-pwr/primary</property>
+		</input>
+		<input>0.0</input>
+        <output>
+            <property>controls/electric/external-power</property>
+        </output>
+    </filter>
+
+	<filter>
+        <name>GrndPwr2-system</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <input>
+			<condition>
+				<property>services/ext-pwr/enable</property>
+            </condition>
+			<property>services/ext-pwr/secondary</property>
+		</input>
+		<input>0.0</input>
+        <output>
+            <property>controls/electric/external-power[1]</property>
+        </output>
+    </filter>	
+	
+	<filter>
+		<name>ExpectedPayloadWeight</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.1</update-interval-secs>
+		<input>
+            <expression>
+                <sum>
+                    <property>services/payload/belly-request-lbs</property>
+					<property>services/catering/request-lbs</property>
+					<product>
+						<property>services/payload/first-request-nr</property>
+						<value>247</value>
+					</product>
+					<product>
+						<property>services/payload/business-request-nr</property>
+						<value>225</value>
+					</product>
+					<product>
+						<property>services/payload/economy-request-nr</property>
+						<value>170</value>
+					</product>
+					<product>
+						<property>services/payload/crew-request-nr</property>
+						<value>150</value>
+					</product>
+                </sum>
+            </expression>
+        </input>
+        <output>services/payload/expected-weight-lbs</output>
+	</filter>
+	
+	<filter>
+		<name>TotalPaxRequestNr</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.1</update-interval-secs>
+		<input>
+            <expression>
+                <sum>
+                    <property>services/payload/first-request-nr</property>
+					<property>services/payload/business-request-nr</property>
+					<property>services/payload/economy-request-nr</property>
+                </sum>
+            </expression>
+        </input>
+        <output>services/payload/pax-request-nr</output>
+	</filter>
+    
+</PropertyList>

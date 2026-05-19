@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<PropertyList>
+
+	<filter>
+        <name>inHg to kpa conversion</name>
+        <type>gain</type>
+        <gain>33.8637526</gain>
+		<input>instrumentation/altimeter/setting-inhg</input>
+		<output>instrumentation/efis/inhg-kpa</output>
+	</filter>
+	
+	<filter>
+        <name>inHg to kpa conversion</name>
+        <type>gain</type>
+        <gain>33.8637526</gain>
+		<input>instrumentation/efis/inhg-previous</input>
+		<output>instrumentation/efis/inhg-kpa-previous</output>
+	</filter>
+
+</PropertyList>

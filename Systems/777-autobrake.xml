@@ -1,0 +1,763 @@
+<?xml version="1.0"?>
+<PropertyList>
+
+    <logic>
+        <name>Disabled state</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <!-- ensure output is consistent when no mode is selected-->
+        <enable>
+            <condition>
+                <or>
+                <equals>
+                    <property>autopilot/autobrake/step</property>
+                    <value>0</value> <!-- DISARM -->
+                </equals>
+                <equals>
+                    <property>autopilot/autobrake/step</property>
+                    <value>-1</value> <!-- OFF -->
+                </equals>
+				<equals>
+					<property>systems/hydraulics/warnsystem/PressSysRight</property>
+					<value>1</value> <!-- Autobrake disabled if right hydr system low press -->
+				</equals>
+                </or>
+            </condition>
+        </enable>
+        <input><false/></input>
+        <output>autopilot/autobrake/engaged</output>
+    </logic>
+
+    <logic>
+        <name>RTO selected</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <input>
+            <equals>
+                <property>autopilot/autobrake/step</property>
+                <value>-2</value>
+            </equals>
+        </input>
+        <output>autopilot/autobrake/rto-selected</output>
+    </logic>
+
+    <logic>
+        <name>Autobrake Selected</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <input>
+            <greater-than>
+                <property>autopilot/autobrake/step</property>
+                <value>0</value>
+            </greater-than>
+        </input>
+        <output>autopilot/autobrake/selected</output>
+    </logic>
+
+    <logic>
+        <name>Throttles At Idle</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <input>
+            <and>
+                <!-- engine 0 -->
+                <or>
+                    <less-than>
+                        <property>controls/engines/engine[0]/throttle-act</property>
+                        <property>autopilot/autobrake/config/idle-throttle</property>
+                    </less-than>
+                    <property>controls/engines/engine[0]/reverser-act</property>
+                </or>
+                <!-- engine 1 -->
+                <or>
+                    <less-than>
+                        <property>controls/engines/engine[1]/throttle-act</property>
+                        <property>autopilot/autobrake/config/idle-throttle</property>
+                    </less-than>
+                    <property>controls/engines/engine[1]/reverser-act</property>
+                </or>
+            </and>
+        </input>
+        <output>autopilot/autobrake/throttles-at-idle</output>
+    </logic>
+
+    <logic>
+        <name>Airborne</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <input>
+            <not><property>gear/gear/wow</property></not>
+        </input>
+        <output>autopilot/autobrake/airborne</output>
+    </logic>
+
+    <logic>
+        <name>High-speed</name>
+        <update-interval-secs type="double">0.3</update-interval-secs>
+        <input>
+            <greater-than>
+                <property>instrumentation/airspeed-indicator/indicated-speed-kt</property>
+                <value>85</value>
+            </greater-than>
+        </input>
+        <output>autopilot/autobrake/above-85-kts</output>
+    </logic>
+    
+
+    <!-- pilot brake input -->
+    <logic>
+        <name>Pilot Input</name>
+        <input>
+            <less-than>
+                <property>autopilot/autobrake/config/pilot-input</property>
+               <expression>
+                    <max>
+                        <property>controls/gear/brake-left</property>
+                        <property>controls/gear/brake-right</property>
+                        <property>controls/gear/copilot-brake-left</property>
+                        <property>controls/gear/copilot-brake-right</property>
+                    </max>
+                </expression>
+            </less-than>
+        </input>
+        <output>autopilot/autobrake/pilot-input</output>
+    </logic>
+
+    <logic>
+        <name>Pitch Up Check</name>
+        <!-- 
+        'If MAX is selected, deceleration level 4 is applied until the pitch angle is less than one degree.'
+        measuring pitch is tricky, so let's use nose-gear WoW instead
+        -->
+        <input>
+            <not><property>gear/gear[1]/wow</property></not>
+        </input>
+        <output>autopilot/autobrake/pitch-up-1deg</output>
+    </logic>
+
+    <flipflop>
+        <name>Autobrake Engage logic</name>
+        <type>RS</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <enable>
+            <condition>
+                <and>
+                    <property>autopilot/autobrake/selected</property>
+                    <not><property>autopilot/autobrake/rto-selected</property></not>
+					<not><property>systems/hydraulics/warnsystem/PressSysRight</property></not>
+                </and>
+            </condition>
+        </enable>
+        
+        <S>
+            <and>
+                <property>autopilot/autobrake/throttles-at-idle</property>
+                <not><property>autopilot/autobrake/airborne</property></not>
+            </and>
+        </S>
+        <R>
+            <false/>
+        </R>
+        <output>autopilot/autobrake/engaged</output>
+    </flipflop>
+
+    <filter>
+        <name>RTO cancel logic</name>
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <!-- from the Continental manual 
+        When the autobrake system disarms during takeoff, the autobrake 
+        selector remains in the RTO position, but automatically moves to 
+        OFF after takeoff.
+        
+        Let's use AGL to simulate 'after takeoff' for the moment
+        -->
+ 
+        <enable>
+            <condition>
+                <property>autopilot/autobrake/rto-selected</property>
+                <property>autopilot/autobrake/airborne</property>
+                <greater-than>
+                    <property>position/altitude-agl-ft</property>
+                    <value>100</value>
+                </greater-than>
+            </condition>
+        </enable>
+        
+        <input><value>-1</value></input> <!-- move to 'off' -->
+        <output>autopilot/autobrake/step</output>
+    </filter>
+    
+    <flipflop>
+        <name>RTO engage logic</name>
+        <type>RS</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <enable>
+            <condition>
+            <property>autopilot/autobrake/rto-selected</property>
+            <property>autopilot/autobrake/above-85-kts</property>
+			<not><property>systems/hydraulics/warnsystem/PressSysRight</property></not>
+            </condition>
+        </enable>
+        <S>
+            <property>autopilot/autobrake/throttles-at-idle</property>
+        </S>
+        <R>
+            <false/>
+        </R>
+        <output>autopilot/autobrake/engaged</output>
+    </flipflop>
+
+    <filter>
+        <name>Disengage logic</name>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <type>gain</type>
+        <gain>1.0</gain>
+        <enable>
+            <condition>
+            <property>autopilot/autobrake/engaged</property>
+            <or>
+                <!-- disengage on pilot input -->
+                <property>autopilot/autobrake/pilot-input</property>
+                
+                <!-- disengage if the throttles are not at idle -->
+                <not><property>autopilot/autobrake/throttles-at-idle</property></not>
+            </or>
+            </condition>
+        </enable>
+        
+        <input><value>0</value></input> <!-- move to 'disarm' -->
+        <output>autopilot/autobrake/step</output>
+    </filter>
+
+    <!-- model the accelerometer portion of the AB system.
+      This could differentiate indicated-airspeed, but I suspect real-
+      world systems use accelerometers directly. -->
+    <filter>
+        <name>Deceleration Sensor</name>
+        <type>noise-spike</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <max-rate-of-change>5.0</max-rate-of-change>
+        <input>
+            <scale>-1</scale> <!-- deceleration, not acceleration -->
+            <property>accelerations/pilot/x-accel-fps_sec</property>
+        </input>
+        <output>autopilot/autobrake/actual-decel-ftsec2</output>
+    </filter>
+
+    <!-- translate dial setting levels into target decelerations, based upon
+        information in the POH -->
+    <filter>
+        <name>Target Deceleration Table</name>
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <output>autopilot/autobrake/target-decel-ftsec2</output>
+        <input>
+           <condition>
+                <not><property>autopilot/autobrake/rto-selected</property></not>
+                <not><equals>
+                    <property>autopilot/autobrake/step</property>
+                    <value>5</value>
+                </equals></not>
+            </condition> 
+            <expression>
+                <!-- values taken from http://static.pprune.org/archive/index.php/t-337486.html;
+                unverified, except that MAX is definitely 11FPS, and the intermediate values
+                looks plausible on that basis 
+                -->
+                <table>
+                    <property>autopilot/autobrake/step</property> 
+                    <entry><ind>0</ind><dep>0</dep></entry>
+                    <entry><ind>1</ind><dep>4</dep></entry>
+                    <entry><ind>2</ind><dep>5</dep></entry>
+                    <entry><ind>3</ind><dep>6</dep></entry>
+                    <entry><ind>4</ind><dep>7</dep></entry>
+                </table>
+            </expression>
+        </input>
+
+        <input>
+              <condition>
+                  <not><property>autopilot/autobrake/rto-selected</property></not>
+                  <property>autopilot/autobrake/pitch-up-1deg</property>
+                  <equals>
+                      <property>autopilot/autobrake/step</property>
+                      <value>5</value>
+                  </equals>
+              </condition>
+              <value>7</value> <!-- MAX limits to 7FPS until pitch is < 1 degree -->
+          </input>
+
+          <input>
+              <condition>
+                  <not><property>autopilot/autobrake/rto-selected</property></not>
+                  <not><property>autopilot/autobrake/pitch-up-1deg</property></not>
+                  <equals>
+                      <property>autopilot/autobrake/step</property>
+                      <value>5</value>
+                  </equals>
+              </condition>
+              <value>11</value> <!-- the real MAX value -->
+          </input>
+        
+        <input>
+           <condition>
+                <property>autopilot/autobrake/rto-selected</property>
+            </condition>
+            <!-- RTO setting applies max hydraulic pressure, simulate this
+              with a huge value here, to ensure the PI drives to 1.0 output -->
+            <value>50</value>
+        </input>
+    </filter>
+
+    <pi-simple-controller>
+        <name>Brake Effort Computer</name>
+        
+        <input>
+			<condition>
+				<property>autopilot/autobrake/engaged</property>
+			</condition>
+			<property>autopilot/autobrake/actual-decel-ftsec2</property>
+		</input>
+		<input>0.0</input>
+        <reference>/autopilot/autobrake/target-decel-ftsec2</reference>
+        
+        <output>autopilot/autobrake/output-brake</output>
+        <min>0.0</min>
+        <max>1.0</max>
+        
+        <config>
+            <Kp>1.0</Kp>
+            <Ki>0.0</Ki>
+        </config>
+    </pi-simple-controller>
+	
+	<filter>
+		<name>Autobrake brake accumulator correction</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.1</update-interval-secs>
+		<max-rate-of-change>0.1</max-rate-of-change>
+		<input>
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<not><property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property></not>
+					<or>
+						<not-equals>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<value>1.0</value>
+						</not-equals>
+						<and>
+							<not><property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property></not>
+						</and>
+					</or>
+				</and>
+			</condition>
+			<expression>
+				<prod>
+					<property>autopilot/autobrake/output-brake</property>
+					<table> <!-- Model reduced brake effectiveness when brake accumulator is low (defaults to 1 if right or center hydraulic systems are operational -->
+						<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+						<entry>
+							<ind>0.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>999.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>1000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+						<entry>
+							<ind>5000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+					</table>
+				</prod>
+			</expression>
+		</input>
+		<input>autopilot/autobrake/output-brake</input>
+		<output>autopilot/autobrake/output-brake-cmd</output>
+	</filter>
+	
+	<!-- Normal vs. Alternate/reserve brake system -->
+	
+	<filter>
+		<name>Left Normal Brake logic</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<!-- Normal brakes operate if right hydraulic system is active or if brake accumulator has enough pressure and both right and center hydraulic systems are inoperative -->
+		<input>
+			<condition>
+				<or>
+					<property>systems/hydraulics/system[2]/m-pump[0]/REDP</property>
+					<property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property>
+					<and>
+						<greater-than>
+							<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+							<property>environment/pressure-psi</property>
+						</greater-than>
+						<not>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+								<and>
+									<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+									<or>
+										<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+									</or>
+								</and>
+							</or>
+						</not>
+					</and>
+				</or>
+			</condition>
+			<expression>
+				<prod>
+					<property>controls/gear/brake-left</property>
+					<table> <!-- Model reduced brake effectiveness when brake accumulator is low (defaults to 1 if any of the right hydr system pumps is running -->
+						<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+						<entry>
+							<ind>0.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>999.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>1000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+						<entry>
+							<ind>5000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+					</table>
+				</prod>
+			</expression>
+		</input>
+		<output>
+			<property>controls/gear/brake-left-cmd</property>
+		</output>
+	</filter>
+	
+	<filter>
+		<name>Left Alternate-Reserve Brake logic</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<input>
+		<!-- Alternate/Reserve brakes operate if Normal brakes don't operate and center pumps are operating (with Isolation Valve open if C1ACMP is not running) -->
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<or>
+						<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+						<and>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+							</or>
+						</and>
+					</or>
+				</and>
+			</condition>
+			<property>controls/gear/brake-left</property>
+		</input>
+		<output>
+			<property>controls/gear/brake-left-reserve</property>
+		</output>
+	</filter>
+	
+	<filter>
+		<name>Right Normal Brake logic</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		
+		<input>
+		<!-- Normal brakes operate if right hydraulic system is active or if brake accumulator has enough pressure and both right and center hydraulic systems are inoperative -->
+			<condition>
+				<or>
+					<property>systems/hydraulics/system[2]/m-pump[0]/REDP</property>
+					<property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property>
+					<and>
+						<greater-than>
+							<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+							<property>environment/pressure-psi</property>
+						</greater-than>
+						<not>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+								<and>
+									<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+									<or>
+										<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+									</or>
+								</and>
+							</or>
+						</not>
+					</and>
+				</or>
+			</condition>
+			<expression>
+				<prod>
+					<property>controls/gear/brake-right</property>
+					<table> <!-- Model reduced brake effectiveness when brake accumulator is low (defaults to 1 if any of the right hydr system pumps is running -->
+						<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+						<entry>
+							<ind>0.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>999.0</ind>
+							<dep>0.0</dep>
+						</entry>
+						<entry>
+							<ind>1000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+						<entry>
+							<ind>5000.0</ind>
+							<dep>1.0</dep>
+						</entry>
+					</table>
+				</prod>
+			</expression>
+		</input>
+		<output>
+			<property>controls/gear/brake-right-cmd</property>
+		</output>
+	</filter>
+	<filter>
+		<name>Right Alternate-Reserve Brake logic</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<input>
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<or>
+						<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+						<and>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+							</or>
+						</and>
+					</or>
+				</and>
+			</condition>
+			<property>controls/gear/brake-right</property>
+		</input>
+		<output>
+			<property>controls/gear/brake-right-reserve</property>
+		</output>
+	</filter>
+	
+	<!-- Brake accumulator -->
+	
+	<filter>
+		<name>Brake accumulator fill-use</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<or>
+					<property>systems/hydraulics/system[2]/m-pump[0]/REDP</property>
+					<property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property>
+				</or>
+			</condition>
+			<expression>
+				<sum>
+					<max>
+						<div>
+							<property>systems/hydraulics/system[2]/press-psi</property>
+							<value>200.0</value>
+						</div>
+						<value>50.0</value>
+					</max>
+					<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<not><property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property></not>
+					<or>
+						<not-equals>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<value>1.0</value>
+						</not-equals>
+						<and>
+							<not><property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property></not>
+						</and>
+					</or>
+					<property>controls/gear/brake-parking</property>
+				</and>
+			</condition>
+			<!-- Brake Accumulator pressure drops slowly at about 180psi/hr (0.01 x 5/sec * 3600 sec) due to leakages when the parking brake is set without any hydraulic power -->
+			<!-- This allows for the parking brake to remain active for at least 8 hours. For longer storage, wheel chocks should be used to prevent unwanted parking brake release. -->
+			<!-- Parking Brake release due to low hydraulic pressure is simulated in nasal/Hydraulics.nas-->
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+					<value>-0.01</value>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<not><property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property></not>
+					<or>
+						<not-equals>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<value>1.0</value>
+						</not-equals>
+						<and>
+							<not><property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property></not>						
+							<not><property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property></not>
+						</and>
+					</or>
+				</and>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[2]/Demand/NormalBrakes-demand-psi</property>
+					<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+		</input>
+		<output>
+			<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+		</output>
+		<min>
+			<property>environment/pressure-psi</property>
+		</min>
+		<max>
+			<expression>
+				<max>
+					<property>systems/hydraulics/system[2]/press-psi</property>
+					<!-- if the accumulator has been overcharged by overpressure in the right hydr system, keep this as the maximum -->
+					<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+				</max>
+			</expression>
+		</max>
+	</filter>
+	
+	<filter>
+		<name>Brake accumulator filtered</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>300</max-rate-of-change>
+		<initialize-to>input</initialize-to>
+		<input>systems/hydraulics/system[2]/brake-accumulator/press-raw</input>
+		<output>systems/hydraulics/system[2]/brake-accumulator/press-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Brake accumulator normalised</name>
+		<type>gain</type>
+		<gain>1</gain>
+		<input>
+			<expression>
+				<div><!-- base model shows brake accumulator at 3200 psi by default -->
+					<sum>
+						<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+						<value>-3200</value>
+					</sum>
+					<value>-3200</value>
+				</div>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/brake-accumulator/press-norm</output> <!-- Drives the brake accumulator needle -->
+	</filter>
+					
+				
+	<!-- left output summer -->
+    <filter>
+        <name>Left Output Summer</name>
+        <type>gain</type>
+        <gain>1.0</gain>
+
+        <input>
+            <condition>
+                <property>autopilot/autobrake/engaged</property>
+            </condition>
+            
+            <expression>
+                <max>
+                    <property>controls/gear/brake-left-cmd</property>
+					<property>controls/gear/brake-left-reserve</property>
+                    <property>autopilot/autobrake/output-brake-cmd</property>
+                </max>
+            </expression>
+        </input>
+        <!-- default input -->
+        <input>
+            <expression>
+				<max>
+					<property>controls/gear/brake-left-cmd</property>
+					<property>controls/gear/brake-left-reserve</property>
+				</max>
+			</expression>
+        </input>
+
+        <output>autopilot/autobrake/left-brake-output</output>
+    </filter>
+    
+    <!-- right output summer -->
+    <filter>
+        <name>Right Output Summer</name>
+        <type>gain</type>
+        <gain>1.0</gain>
+
+        <input>
+            <condition>
+                <property>autopilot/autobrake/engaged</property>
+            </condition>
+            
+            <expression>
+                <max>
+                    <property>controls/gear/brake-right-cmd</property>
+					<property>controls/gear/brake-right-reserve</property>
+                    <property>autopilot/autobrake/output-brake-cmd</property>
+                </max>
+            </expression>
+        </input>
+        <!-- default input -->
+        <input>
+            <expression>
+				<max>
+					<property>controls/gear/brake-right-cmd</property>
+					<property>controls/gear/brake-right-reserve</property>
+				</max>
+			</expression>
+        </input>
+
+        <output>autopilot/autobrake/right-brake-output</output>
+    </filter>
+
+</PropertyList>

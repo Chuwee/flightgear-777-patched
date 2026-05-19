@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (2aeb623e1d, 2025-05-12)"
+   sodipodi:docname="vnav_restriction.svg"
+   inkscape:export-filename="../48cfb179/vnav_restriction.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.97993827"
+     inkscape:cx="396.96378"
+     inkscape:cy="561.25984"
+     inkscape:window-width="2560"
+     inkscape:window-height="1305"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#20652c;stroke-width:1.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 14.31,82.889999 H 201.15"
+       id="path1"
+       inkscape:export-filename="../48cfb179/vnav_restriction.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#20652c;stroke-width:1.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.884408,175.62279 H 196.72441"
+       id="path1-3"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:14%;font-family:Sans;-inkscape-font-specification:'Sans, Normal ';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-orientation:upright;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="100.87921"
+       y="80.689888"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-size:7.05556px;line-height:14%;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="100.87921"
+         y="80.689888">mcp altitude</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:14%;font-family:Sans;-inkscape-font-specification:'Sans, Normal ';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-orientation:upright;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="139.02936"
+       y="181.71587"
+       id="text1-1"><tspan
+         sodipodi:role="line"
+         id="tspan1-2"
+         style="font-size:7.05556px;line-height:14%;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="139.02936"
+         y="181.71587">airplane altitude</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#e51bb4;stroke-width:0.665;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.9899998,176.04 67.23,156.87 l 43.74,-36.99 51.3,0.27 L 210,84.509998 v 0"
+       id="path2"
+       sodipodi:nodetypes="cccccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal ';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-orientation:upright;text-anchor:end;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="67.230003"
+       y="156.87"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-size:7.05556px;writing-mode:lr-tb;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="67.230003"
+         y="156.87">OBLOC</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.05556px;writing-mode:lr-tb;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="67.230003"
+         y="165.68944"
+         id="tspan6">3000</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.05556px;writing-mode:lr-tb;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="67.230003"
+         y="174.5089"
+         id="tspan7" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal ';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-orientation:upright;text-anchor:end;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="168.40671"
+       y="115.56773"
+       id="text2-6"><tspan
+         sodipodi:role="line"
+         id="tspan2-0"
+         style="font-size:7.05556px;writing-mode:lr-tb;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="168.40671"
+         y="115.56773">SECHE</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.05556px;writing-mode:lr-tb;fill:#060606;fill-opacity:1;stroke:none;stroke-width:0.264583px"
+         x="168.40671"
+         y="124.38718"
+         id="tspan5">8000</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:19.7556px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal ';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:tb-rl;text-orientation:upright;text-anchor:end;fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="170.10001"
+       y="123.12"
+       id="text3"
+       inkscape:export-filename="../48cfb179/vnav_restriction.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.264583px"
+         x="170.10001"
+         y="123.12"></tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583px"
+         id="tspan4"
+         x="145.4055"
+         y="123.12" /></text>
+  </g>
+</svg>

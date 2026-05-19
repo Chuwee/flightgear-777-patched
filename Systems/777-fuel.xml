@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+
+    <filter>
+        <name>Fuel fraction calculation</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <property>consumables/fuel/total-fuel-norm</property>
+        </input>
+        <output>sim/fuel-fraction</output>
+    </filter>
+    
+    <filter>
+        <name>ZFW calculation</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+                <sum>
+                    <property>yasim/gross-weight-lbs</property>
+                    <product>
+                        <value>-1</value>
+                        <property>consumables/fuel/total-fuel-lbs</property>
+                    </product>
+                </sum>
+            </expression>
+        </input>
+        <output>yasim/zero-fuel-weight-lbs</output>
+    </filter>
+    
+    <filter>
+        <name>Gross weight norm calc</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+                <div> <!-- divide gross weight with MTOW to calculate the normalized gross weight: 0 = empty weight, 1 = maximum takeoff weight-->
+                    <difference> <!-- calculate the gross weight without the empty weight-->
+                        <property>yasim/gross-weight-lbs</property>
+                        <property>yasim/empty-weight-lbs</property>
+                    </difference>
+                    <difference> <!-- calculate the maximum takeoff weight without the empty weight -->
+                        <property>sim/max-takeoff-weight</property>
+                        <property>yasim/empty-weight-lbs</property>
+                    </difference>
+                </div>
+            </expression>
+        </input>
+        <output>yasim/gross-weight-norm</output>
+    </filter>
+    
+    <filter>
+        <name>Wingflexer z-force calculation</name>
+        <type>gain</type>
+        <update-interval-secs type="double">0.05</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+                <product>
+                    <property>fdm/yasim/forces/f-z-lift</property>
+                    <value>-0.224809</value><!-- invert and convert from Newton to LBF -->
+                </product>
+            </expression>
+        </input>
+        <output>fdm/yasim/forces/f-z-lift-lbf</output>
+    </filter>
+
+</PropertyList>

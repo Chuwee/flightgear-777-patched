@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PropertyList>
+
+    <name>Autoconnect</name>
+    <layout>vbox</layout>
+
+    <group>
+    <layout>hbox</layout>
+        <text>
+            <label>  </label>
+        </text>
+        
+        <empty>
+            <stretch>true</stretch>
+        </empty>
+        
+        <text>
+            <label>Autoconnect</label>
+        </text>
+        
+        <empty>
+            <stretch>true</stretch>
+        </empty>
+        
+        <button>
+            <halign>right</halign>
+            <pref-width>16</pref-width>
+            <pref-height>16</pref-height>
+            <legend/>
+            <key>Esc</key>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+        </button>
+        
+    </group>
+
+    <hrule />
+    
+    <checkbox>
+        <row>0</row>
+        <col>0</col>
+        <label>Enable Autoconnect: Autodetect On Blocks Time and connect ground services.</label>
+        <property>aircraft/settings/gnd_autoconnect</property>
+        <binding>
+            <command>dialog-apply</command>
+        </binding>
+        <live>true</live>
+    </checkbox>
+    
+    <hrule />
+    
+    <text>
+        <label>Select the services that should automatically connect after parking.</label>
+    </text>
+     
+    <group>
+    <layout>table</layout>
+        <checkbox>
+            <row>0</row>
+            <col>0</col>
+            <label>Ground Power 1</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/GPU1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+    
+        <checkbox>
+            <row>1</row>
+            <col>0</col>
+            <label>Ground Power 2</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/GPU2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>2</row>
+            <col>0</col>
+            <label>Wheel Chocks</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Chocks</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>3</row>
+            <col>0</col>
+            <label>Safety Cones</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Cones</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>4</row>
+            <col>0</col>
+            <halign>center</halign>
+            <legend>Select default config</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    setprop("aircraft/settings/autoconnect/GPU1", 1);
+                    setprop("aircraft/settings/autoconnect/GPU2", 0);
+                    setprop("aircraft/settings/autoconnect/Chocks", 1);
+                    setprop("aircraft/settings/autoconnect/Cones", 1);
+                    setprop("aircraft/settings/autoconnect/Jetway1", 1);
+                    setprop("aircraft/settings/autoconnect/Jetway2", 1);
+                    setprop("aircraft/settings/autoconnect/Stairs1", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs2", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs3", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs4", 0);
+                    setprop("aircraft/settings/autoconnect/Catering1", 1);
+                    setprop("aircraft/settings/autoconnect/Catering2", 1);
+                    setprop("aircraft/settings/autoconnect/Catering3", 1);
+                    setprop("aircraft/settings/autoconnect/Catering4", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruck", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruckPipe", 1);
+                    setprop("aircraft/settings/autoconnect/Bus1", 0);
+                    setprop("aircraft/settings/autoconnect/Bus2", 0);
+                    setprop("aircraft/settings/autoconnect/Baggage1", 1);
+                    setprop("aircraft/settings/autoconnect/Baggage2", 1);
+                </script>
+            </binding>
+            <binding>
+                <command>dialog-update</command>
+            </binding>
+        </button>
+    
+        <checkbox>
+            <row>0</row>
+            <col>1</col>
+            <label>Jetway 1L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Jetway1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    if (getprop("aircraft/settings/autoconnect/Jetway1") == 1) {
+                        setprop("aircraft/settings/autoconnect/Stairs1", 0);
+                    }
+                </script>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>1</row>
+            <col>1</col>
+            <label>Jetway 2L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Jetway2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    if (getprop("aircraft/settings/autoconnect/Jetway2") == 1) {
+                        setprop("aircraft/settings/autoconnect/Stairs2", 0);
+                    }
+                </script>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>2</row>
+            <col>1</col>
+            <label>Baggage Truck F</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Baggage1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>3</row>
+            <col>1</col>
+            <label>Baggage Truck R</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Baggage2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>4</row>
+            <col>1</col>
+            <halign>center</halign>
+            <legend>Select Jetway config</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    setprop("aircraft/settings/autoconnect/GPU1", 1);
+                    setprop("aircraft/settings/autoconnect/GPU2", 1);
+                    setprop("aircraft/settings/autoconnect/Chocks", 1);
+                    setprop("aircraft/settings/autoconnect/Cones", 1);
+                    setprop("aircraft/settings/autoconnect/Jetway1", 1);
+                    setprop("aircraft/settings/autoconnect/Jetway2", 1);
+                    setprop("aircraft/settings/autoconnect/Stairs1", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs2", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs3", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs4", 0);
+                    setprop("aircraft/settings/autoconnect/Catering1", 1);
+                    setprop("aircraft/settings/autoconnect/Catering2", 1);
+                    setprop("aircraft/settings/autoconnect/Catering3", 1);
+                    setprop("aircraft/settings/autoconnect/Catering4", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruck", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruckPipe", 1);
+                    setprop("aircraft/settings/autoconnect/Bus1", 0);
+                    setprop("aircraft/settings/autoconnect/Bus2", 0);
+                    setprop("aircraft/settings/autoconnect/Baggage1", 1);
+                    setprop("aircraft/settings/autoconnect/Baggage2", 1);
+                </script>
+            </binding>
+            <binding>
+                <command>dialog-update</command>
+            </binding>
+        </button>
+        
+        <checkbox>
+            <row>0</row>
+            <col>2</col>
+            <label>Stairs 1L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Stairs1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    if (getprop("aircraft/settings/autoconnect/Stairs1") == 1) {
+                        setprop("aircraft/settings/autoconnect/Jetway1", 0);
+                    }
+                </script>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>1</row>
+            <col>2</col>
+            <label>Stairs 2L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Stairs2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    if (getprop("aircraft/settings/autoconnect/Stairs2") == 1) {
+                        setprop("aircraft/settings/autoconnect/Jetway2", 0);
+                    }
+                </script>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>2</row>
+            <col>2</col>
+            <label>Stairs 4L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Stairs3</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>3</row>
+            <col>2</col>
+            <label>Stairs 5L</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Stairs4</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>4</row>
+            <col>2</col>
+            <halign>center</halign>
+            <legend>Select Stairs config</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    setprop("aircraft/settings/autoconnect/GPU1", 1);
+                    setprop("aircraft/settings/autoconnect/GPU2", 0);
+                    setprop("aircraft/settings/autoconnect/Chocks", 1);
+                    setprop("aircraft/settings/autoconnect/Cones", 1);
+                    setprop("aircraft/settings/autoconnect/Jetway1", 0);
+                    setprop("aircraft/settings/autoconnect/Jetway2", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs1", 1);
+                    setprop("aircraft/settings/autoconnect/Stairs2", 1);
+                    setprop("aircraft/settings/autoconnect/Stairs3", 1);
+                    setprop("aircraft/settings/autoconnect/Stairs4", 1);
+                    setprop("aircraft/settings/autoconnect/Catering1", 1);
+                    setprop("aircraft/settings/autoconnect/Catering2", 1);
+                    setprop("aircraft/settings/autoconnect/Catering3", 1);
+                    setprop("aircraft/settings/autoconnect/Catering4", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruck", 1);
+                    setprop("aircraft/settings/autoconnect/FuelTruckPipe", 1);
+                    setprop("aircraft/settings/autoconnect/Bus1", 1);
+                    setprop("aircraft/settings/autoconnect/Bus2", 1);
+                    setprop("aircraft/settings/autoconnect/Baggage1", 1);
+                    setprop("aircraft/settings/autoconnect/Baggage2", 1);
+                </script>
+            </binding>
+            <binding>
+                <command>dialog-update</command>
+            </binding>
+        </button>
+        
+        <checkbox>
+            <row>0</row>
+            <col>3</col>
+            <label>Catering 1R</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Catering1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>1</row>
+            <col>3</col>
+            <label>Catering 2R</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Catering2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>2</row>
+            <col>3</col>
+            <label>Catering 4R</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Catering3</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>3</row>
+            <col>3</col>
+            <label>Catering 5R</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Catering4</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>4</row>
+            <col>3</col>
+            <halign>center</halign>
+            <legend>Select Nothing</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+                <command>nasal</command>
+                <script>
+                    setprop("aircraft/settings/autoconnect/GPU1", 0);
+                    setprop("aircraft/settings/autoconnect/GPU2", 0);
+                    setprop("aircraft/settings/autoconnect/Chocks", 0);
+                    setprop("aircraft/settings/autoconnect/Cones", 0);
+                    setprop("aircraft/settings/autoconnect/Jetway1", 0);
+                    setprop("aircraft/settings/autoconnect/Jetway2", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs1", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs2", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs3", 0);
+                    setprop("aircraft/settings/autoconnect/Stairs4", 0);
+                    setprop("aircraft/settings/autoconnect/Catering1", 0);
+                    setprop("aircraft/settings/autoconnect/Catering2", 0);
+                    setprop("aircraft/settings/autoconnect/Catering3", 0);
+                    setprop("aircraft/settings/autoconnect/Catering4", 0);
+                    setprop("aircraft/settings/autoconnect/FuelTruck", 0);
+                    setprop("aircraft/settings/autoconnect/FuelTruckPipe", 0);
+                    setprop("aircraft/settings/autoconnect/Bus1", 0);
+                    setprop("aircraft/settings/autoconnect/Bus2", 0);
+                    setprop("aircraft/settings/autoconnect/Baggage1", 0);
+                    setprop("aircraft/settings/autoconnect/Baggage2", 0);
+                </script>
+            </binding>
+            <binding>
+                <command>dialog-update</command>
+            </binding>
+        </button>
+        
+        <checkbox>
+            <row>0</row>
+            <col>4</col>
+            <label>Fuel Truck</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/FuelTruck</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>1</row>
+            <col>4</col>
+            <label>Fuel Pipe</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/FuelTruckPipe</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>2</row>
+            <col>4</col>
+            <label>Bus Front</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Bus1</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>3</row>
+            <col>4</col>
+            <label>Bus Rear</label>
+            <halign>left</halign>
+            <property>aircraft/settings/autoconnect/Bus2</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>4</row>
+            <col>4</col>
+            <halign>center</halign>
+            <legend>Modify Stairs Type</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+                <command>dialog-show</command>
+                <dialog-name>stairs_paint</dialog-name>
+            </binding>
+        </button>
+
+    </group>
+    
+    <hrule />
+    
+    <text>
+        <label>General Settings</label>
+    </text>
+    
+    <group>
+        <layout>table</layout>
+    
+        <checkbox>
+            <row>0</row>
+            <col>0</col>
+            <halign>center</halign>
+			<pref-width>135</pref-width>
+            <label>Connect 3D Jetways if available</label>
+            <property>aircraft/settings/gnd_autojetways</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <checkbox>
+            <row>1</row>
+            <col>0</col>
+            <halign>center</halign>
+			<pref-width>135</pref-width>
+            <label>Enable realistic connection times</label>
+            <property>aircraft/settings/gnd_autoconnect_delay</property>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <live>true</live>
+        </checkbox>
+        
+        <button>
+            <row>0</row>
+            <col>1</col>
+            <halign>center</halign>
+			<pref-width>135</pref-width>
+            <legend>Autoconnect now</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+				<command>property-assign</command>
+                <property>aircraft/settings/autoconnect/force-start</property>
+				<value>1.0</value>
+            </binding>
+        </button>
+		
+		<button>
+            <row>1</row>
+            <col>1</col>
+            <halign>center</halign>
+			<pref-width>135</pref-width>
+            <legend>Stop autoconnect</legend>
+            <pref-width>135</pref-width>
+            <pref-height>24</pref-height>
+            <binding>
+				<command>property-assign</command>
+                <property>aircraft/settings/autoconnect/force-stop</property>
+				<value>1.0</value>
+            </binding>
+        </button>
+        
+		<text>
+			<row>0</row>
+			<col>2</col>
+			<pref-width>135</pref-width>
+			<label>Autoconnect status</label>
+			<live>true</live>
+			<halign>center</halign>
+		</text>
+		
+		<text>
+			<row>1</row>
+			<col>2</col>
+			<pref-width>135</pref-width>
+			<property>aircraft/settings/autoconnect/status</property>
+			<live>true</live>
+			<halign>left</halign>
+		</text>
+    
+    </group>
+
+    <hrule />
+
+    <group>
+    <layout>hbox</layout>
+
+        <button>
+            <legend>Close</legend>
+            <default>true</default>
+            <key>Esc</key>
+        <padding>5</padding>
+            <binding>
+                <command>dialog-apply</command>
+            </binding>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+        </button>
+        
+    </group>
+
+</PropertyList>

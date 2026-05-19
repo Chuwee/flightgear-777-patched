@@ -1,0 +1,1554 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+
+<!-- Property rules-->
+
+	<!-- Hydraulic reservoir levels -->
+    <filter>
+        <name>Hydraulic reservoir L level</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+				<max>
+					<div> <!-- divide actual hydraulic fluid level by tank capacity-->
+						<sum>
+							<property>consumables/hydraulics/reservoir[0]/level-gal</property>
+							<value>-2.0</value> <!-- Left hydraulic lvl reads zero at standpipe level.
+													There is a 2 gal reserve for the L Demand pump to operate.-->	
+						</sum>
+						<sum>
+							<property>consumables/hydraulics/reservoir[0]/capacity-gal</property>
+							<value>-2.0</value> <!-- substract fictional 2 gal from tank capacity so it reads
+													full at full capacity.-->
+						</sum>
+					</div>
+					<value>0.0</value> <!-- Cannot read less than zero-->
+				</max>
+			</expression>
+        </input>
+        <output>consumables/hydraulics/reservoir[0]/level-norm</output>
+    </filter>
+	
+	<filter>
+        <name>Hydraulic reservoir C level</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+				<max>
+					<div> <!-- divide actual hydraulic fluid level by tank capacity-->
+						<sum>
+							<property>consumables/hydraulics/reservoir[1]/level-gal</property>
+							<value>-1.2</value> <!-- Center hydraulic lvl reads zero at standpipe level.
+													There is a 1.2 gal reserve for the C1 Elec pump to operate.-->	
+						</sum>
+						<sum>
+							<property>consumables/hydraulics/reservoir[1]/capacity-gal</property>
+							<value>-1.2</value> <!-- substract fictional 1.2 gal from tank capacity so it reads
+													full at full capacity.-->
+						</sum>
+					</div>
+					<value>0.0</value> <!-- Cannot read less than zero-->
+				</max>
+			</expression>
+        </input>
+        <output>consumables/hydraulics/reservoir[1]/level-norm</output>
+    </filter>
+	
+	<filter>
+        <name>Hydraulic reservoir R level</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+				<max>
+					<div> <!-- divide actual hydraulic fluid level by tank capacity-->
+						<sum>
+							<property>consumables/hydraulics/reservoir[2]/level-gal</property>
+							<value>-2.0</value> <!-- Right hydraulic lvl reads zero at standpipe level.
+													There is a 2 gal reserve for the R Demand pump to operate.-->	
+						</sum>
+						<sum>
+							<property>consumables/hydraulics/reservoir[2]/capacity-gal</property>
+							<value>-2.0</value> <!-- substract fictional 2 gal from tank capacity so it reads
+													full at full capacity.-->
+						</sum>
+					</div>
+					<value>0.0</value> <!-- Cannot read less than zero-->
+				</max>
+			</expression>
+        </input>
+        <output>consumables/hydraulics/reservoir[2]/level-norm</output>
+    </filter>
+	
+	<filter>
+		<name>Left Reservoir lvl filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.02</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[0]/level-gal</input>
+		<output>consumables/hydraulics/reservoir[0]/level-gal-cmd</output>
+	</filter>
+	<filter>
+		<name>Ctr Reservoir lvl filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.02</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[1]/level-gal</input>
+		<output>consumables/hydraulics/reservoir[1]/level-gal-cmd</output>
+	</filter>
+	<filter>
+		<name>Right Reservoir lvl filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.02</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[2]/level-gal</input>
+		<output>consumables/hydraulics/reservoir[2]/level-gal-cmd</output>
+	</filter>
+	
+	<filter>
+		<name>Left Reservoir norm filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.008</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[0]/level-norm</input>
+		<output>consumables/hydraulics/reservoir[0]/level-norm-cmd</output>
+	</filter>
+	<filter>
+		<name>Ctr Reservoir norm filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.008</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[1]/level-norm</input>
+		<output>consumables/hydraulics/reservoir[1]/level-norm-cmd</output>
+	</filter>
+	<filter>
+		<name>Right Reservoir norm filter</name>
+		<type>noise-spike</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<max-rate-of-change>0.008</max-rate-of-change>
+		<input>consumables/hydraulics/reservoir[2]/level-norm</input>
+		<output>consumables/hydraulics/reservoir[2]/level-norm-cmd</output>
+	</filter>
+	
+	<!-- Input filters -->
+	
+	<filter>
+        <name>Outside pressure conversion</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">5.0</update-interval-secs> <!-- no frequent updates needed -->
+        <gain>1.0</gain>
+        <input>
+            <expression>
+				<div> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>environment/pressure-inhg</property> <!-- Outside air pressure -->
+					<value>2.03602</value> <!-- inHg to psi division factor -->
+				</div>
+			</expression>
+        </input>
+        <output>environment/pressure-psi</output>
+    </filter>
+	
+	<filter>
+        <name>Combined brake detection</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+            <expression>
+				<max> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>controls/gear/brake-left-cmd</property>
+					<property>controls/gear/brake-right-cmd</property>
+				</max>
+			</expression>
+        </input>
+        <output>controls/gear/brake-comb</output>
+    </filter>
+	
+	<filter>
+		<name>Brake Accum Parking Brake Pressure Drop</name>
+		<type>gain</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<gain>1.0</gain>
+		<input>
+			<expression>
+				<table>
+					<property>systems/hydraulics/system[2]/brake-accumulator/press-raw</property>
+					<entry><ind>0</ind><dep>0</dep></entry>
+                    <entry><ind>1000</ind><dep>1000</dep></entry>
+                    <entry><ind>1200</ind><dep>750</dep></entry>
+                    <entry><ind>3000</ind><dep>500</dep></entry>
+					<entry><ind>4500</ind><dep>350</dep></entry>
+				</table>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/brake-accumulator/Parking-Brake-Drop</output>
+	</filter>
+	
+	<filter>
+		<name>Parking Brake application</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<input>
+			<condition>
+				<or>
+					<greater-than>
+						<property>systems/hydraulics/system[1]/press-psi</property>
+						<value>1000</value>
+					</greater-than>
+					<greater-than>
+						<property>systems/hydraulics/system[2]/press-psi</property>
+						<value>1000</value>
+					</greater-than>
+					<greater-than>
+						<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+						<property>systems/hydraulics/system[2]/brake-accumulator/Parking-Brake-Drop</property>
+					</greater-than>
+				</or>
+			</condition>
+			<property>controls/gear/brake-parking</property>
+		</input>
+		<input>0.0</input>
+		<output>controls/gear/brake-parking-set</output>
+	</filter>
+	
+	
+	
+	<!-- Hydraulic system pressure -->
+	
+	<!-- Left System pumps -->
+	
+	<filter>
+        <name>LEDP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <!-- Left Primary Pump running -->
+		<input>
+			<expression>
+				<prod>
+					<!-- If primary pump is off: multiply with 0 -->
+					<property>systems/hydraulics/system[0]/m-pump[0]/LEDP</property>
+					<sum>
+						<value>2926</value> <!-- base value -->
+						<prod>
+							<value>1.499</value> <!-- allows for ± 30 to 180 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+						</prod>
+					</sum>
+				</prod>
+			</expression>
+		</input>
+        <output>systems/hydraulics/system[0]/m-pump[0]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>LEDP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>500</max-rate-of-change>
+		<input>systems/hydraulics/system[0]/m-pump[0]/press-set</input>
+		<output>systems/hydraulics/system[0]/m-pump[0]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>LACMP Pressure setting</name> 
+        <type>gain</type>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+        <!-- Left Demand Pump running -->
+		<input> <!-- TODO: make these numbers depend on small electrical fluctuations -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[0]/m-pump[1]/LACMP</property>
+					<sum>
+						<value>2995</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+							<value>100</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[0]/m-pump[1]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>LACMP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>300</max-rate-of-change>
+		<input>systems/hydraulics/system[0]/m-pump[1]/press-set</input>
+		<output>systems/hydraulics/system[0]/m-pump[1]/press-psi</output>
+	</filter>
+	
+	<!-- Left system demand -->
+	
+	<filter>
+		<name>Left Flight Control Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<sum>
+						<abs><property>surface-positions/elevator-trim-tab-pos-norm</property></abs>
+						<abs><property>surface-positions/left-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/right-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/rudder-pos-norm</property></abs>
+						<abs><property>surface-positions/speedbrake-pos-norm</property></abs>
+					</sum>
+					<value>-100</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/Demand/Fltctrl-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Left Reverser Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[0]/Demand/Rev_L</property>
+					<value>-750</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/Demand/Rev_L-demand-set</output>
+	</filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>100</max-rate-of-change>
+		<input>systems/hydraulics/system[0]/Demand/Rev_L-demand-set</input>
+		<output>systems/hydraulics/system[0]/Demand/Rev_L-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Left System Leak Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[0]/Demand/Leak</property>
+					<value>0.0</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[0]/Demand/Leak</property>
+					<value>-200</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/Demand/Leak-demand-psi</output>
+	</filter>
+
+	<filter>
+		<name>Left System Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[0]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[0]/m-pump[1]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/TotalPumpPress-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Left System Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[0]/Demand/Fltctrl-demand-psi</property>
+					<property>systems/hydraulics/system[0]/Demand/Rev_L-demand-psi</property>
+					<property>systems/hydraulics/system[0]/Demand/Leak-demand-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/TotalDemandPress-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Left System Total Pressure Difference</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[0]/TotalPumpPress-psi</property>
+					<property>systems/hydraulics/system[0]/TotalDemandPress-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[0]/PressDiff-psi</output>
+	</filter>
+	
+	<filter>
+        <name>Hydraulic L system pressure</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[0]/PressDiff-psi</property>
+					<value>2500</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<max> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>systems/hydraulics/system[0]/m-pump[0]/press-psi</property> <!-- Left Primary Pump pressure -->
+					<property>systems/hydraulics/system[0]/m-pump[1]/press-psi</property> <!-- Left Demand pump pressure -->
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+        </input>
+		<input>
+			<expression>
+				<max>
+					<property>systems/hydraulics/system[0]/PressDiff-psi</property>
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+		</input>
+        <output>systems/hydraulics/system[0]/press-set</output>
+    </filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>500</max-rate-of-change>
+		<input>systems/hydraulics/system[0]/press-set</input>
+		<output>systems/hydraulics/system[0]/press-psi</output>
+	</filter>
+	
+	<!-- Right System pumps -->
+	
+	<filter>
+        <name>REDP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <!-- Right Primary Pump running -->
+		<input>
+			<expression>
+				<prod>
+					<!-- If primary pump is off: multiply with 0 -->
+					<property>systems/hydraulics/system[2]/m-pump[0]/REDP</property>
+					<sum>
+						<value>2920</value> <!-- base value -->
+						<prod>
+							<value>1.501</value> <!-- allows for ± 30 to 180 psi on top of the b ase value -->
+							<property>engines/engine[1]/rpm</property>
+						</prod>
+					</sum>
+				</prod>
+			</expression>
+		</input>
+        <output>systems/hydraulics/system[2]/m-pump[0]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>REDP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>500</max-rate-of-change>
+		<input>systems/hydraulics/system[2]/m-pump[0]/press-set</input>
+		<output>systems/hydraulics/system[2]/m-pump[0]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>RACMP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+		<!-- Right Demand Pump running -->
+		<input> <!-- TODO: make these numbers depend on small electrical fluctuations -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property>
+					<sum>
+						<value>2995</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[1]/rpm</property>
+							<value>100</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[2]/m-pump[1]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>RACMP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>300</max-rate-of-change>
+		<input>systems/hydraulics/system[2]/m-pump[1]/press-set</input>
+		<output>systems/hydraulics/system[2]/m-pump[1]/press-psi</output>
+	</filter>
+	
+	<!-- Right system demand -->
+	
+	<filter>
+		<name>Right Flight Control Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<sum>
+						<abs><property>surface-positions/elevator-trim-tab-pos-norm</property></abs>
+						<abs><property>surface-positions/left-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/right-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/rudder-pos-norm</property></abs>
+						<abs><property>surface-positions/speedbrake-pos-norm</property></abs>
+					</sum>
+					<value>-100</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/Demand/Fltctrl-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Right Reverser Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[2]/Demand/Rev_R</property>
+					<value>-750</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/Demand/Rev_R-demand-set</output>
+	</filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>100</max-rate-of-change>
+		<input>systems/hydraulics/system[2]/Demand/Rev_R-demand-set</input>
+		<output>systems/hydraulics/system[2]/Demand/Rev_R-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Normal Brakes Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<or>
+					<property>systems/hydraulics/system[2]/m-pump[0]/REDP</property>
+					<property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property>
+					<and>
+						<greater-than>
+							<property>systems/hydraulics/system[2]/brake-accumulator/press-psi</property>
+							<property>environment/pressure-psi</property>
+						</greater-than>
+						<not>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+								<and>
+									<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+									<or>
+										<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+										<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+									</or>
+								</and>
+							</or>
+						</not>
+					</and>
+				</or>
+			</condition>
+			<expression>
+				<prod>
+					<sum>
+						<property>controls/gear/brake-left-cmd</property>
+						<property>controls/gear/brake-right-cmd</property>
+					</sum>
+					<value>-30</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/Demand/NormalBrakes-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Right System Leak Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[2]/Demand/Leak</property>
+					<value>0.0</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[2]/Demand/Leak</property>
+					<value>-200</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/Demand/Leak-demand-psi</output>
+	</filter>
+
+	<filter>
+		<name>Right System Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[2]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[2]/m-pump[1]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/TotalPumpPress-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Right System Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[2]/Demand/Fltctrl-demand-psi</property>
+					<property>systems/hydraulics/system[2]/Demand/Rev_R-demand-psi</property>
+					<property>systems/hydraulics/system[2]/Demand/NormalBrakes-demand-psi</property>
+					<property>systems/hydraulics/system[2]/Demand/Leak-demand-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/TotalDemandPress-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Right System Total Pressure Difference</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[2]/TotalPumpPress-psi</property>
+					<property>systems/hydraulics/system[2]/TotalDemandPress-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[2]/PressDiff-psi</output>
+	</filter>
+	
+	<filter>
+        <name>Hydraulic R system pressure</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[2]/PressDiff-psi</property>
+					<value>2500</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<max> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>systems/hydraulics/system[2]/m-pump[0]/press-psi</property> <!-- Left Primary Pump pressure -->
+					<property>systems/hydraulics/system[2]/m-pump[1]/press-psi</property> <!-- Left Demand pump pressure -->
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+        </input>
+		<input>
+			<expression>
+				<max>
+					<property>systems/hydraulics/system[2]/PressDiff-psi</property>
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+		</input>
+        <output>systems/hydraulics/system[2]/press-set</output>
+    </filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>500</max-rate-of-change>
+		<input>systems/hydraulics/system[2]/press-set</input>
+		<output>systems/hydraulics/system[2]/press-psi</output>
+	</filter>
+	
+	<!-- Center System pumps -->
+	
+	<filter>
+        <name>C1ACMP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+		<input> <!-- TODO: make these numbers depend on small electrical fluctuations -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+					<sum>
+						<value>2997</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+							<value>100</value>
+						</div>
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[1]/rpm</property>
+							<value>100</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[1]/m-pump[0]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>C1ACMP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>300</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/m-pump[0]/press-set</input>
+		<output>systems/hydraulics/system[1]/m-pump[0]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>C1ADP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+		<input> <!-- TODO: make these numbers depend on the bleed air system -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>
+					<sum>
+						<value>2991</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+							<value>101</value>
+						</div>
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[1]/rpm</property>
+							<value>99</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[1]/m-pump[1]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>C1ADP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>400</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/m-pump[1]/press-set</input>
+		<output>systems/hydraulics/system[1]/m-pump[1]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>C2ACMP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+		<input> <!-- TODO: make these numbers depend on small electrical fluctuations -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>
+					<sum>
+						<value>2998</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+							<value>99</value>
+						</div>
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[1]/rpm</property>
+							<value>101</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[1]/m-pump[2]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>C2ACMP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>300</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/m-pump[2]/press-set</input>
+		<output>systems/hydraulics/system[1]/m-pump[2]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>C2ADP Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+		<input> <!-- TODO: make these numbers depend on the bleed air system -->
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+					<sum>
+						<value>2994</value> <!-- base value -->
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[0]/rpm</property>
+							<value>101</value>
+						</div>
+						<div> <!-- Allows for ± 0 to 11 psi on top of the base value -->
+							<property>engines/engine[1]/rpm</property>
+							<value>101</value>
+						</div>
+					</sum>
+				</prod>
+			</expression>			
+		</input>
+        <output>systems/hydraulics/system[1]/m-pump[3]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>C2ADP Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>400</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/m-pump[3]/press-set</input>
+		<output>systems/hydraulics/system[1]/m-pump[3]/press-psi</output>
+	</filter>
+	
+	<filter>
+        <name>RAT Pressure setting</name> 
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>2785.0</gain>
+        <input>systems/hydraulics/system[1]/m-pump[4]/RAT</input> <!-- Right Demand Pump running -->
+        <output>systems/hydraulics/system[1]/m-pump[4]/press-set</output>
+    </filter>
+	
+	<filter>
+		<name>RAT Pressure filter</name>
+		<type>noise-spike</type>
+		<max-rate-of-change>250</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/m-pump[4]/press-set</input>
+		<output>systems/hydraulics/system[1]/m-pump[4]/press-psi</output>
+	</filter>	
+	
+	<!-- Center system demand -->
+	
+	<filter>
+		<name>NoseGear Steering Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<property>controls/gear/nosegear-steering-cmd-norm</property>
+					<value>-20</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/NoseGearSteering-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>NoseGear Retraction Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>gear/gear[0]/position-norm</property>
+					<property>controls/gear/gear-down</property>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>gear/gear[0]/position-norm</property>
+					<value>-280</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/NoseGearRetraction-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Alternate-Reserve Brakes Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<and>
+					<not><property>systems/hydraulics/system[2]/m-pump[0]/REDP</property></not>
+					<not><property>systems/hydraulics/system[2]/m-pump[1]/RACMP</property></not>
+					<or>
+						<property>systems/hydraulics/system[1]/m-pump[0]/C1ACMP</property>
+						<and>
+							<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+							<or>
+								<property>systems/hydraulics/system[1]/m-pump[1]/C1ADP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[2]/C2ACMP</property>								
+								<property>systems/hydraulics/system[1]/m-pump[3]/C2ADP</property>
+							</or>
+						</and>
+					</or>
+				</and>
+			</condition>
+			<expression>
+				<prod>
+					<sum>
+						<property>controls/gear/brake-left-reserve</property>
+						<property>controls/gear/brake-right-reserve</property>
+					</sum>
+					<value>-30</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/ReserveBrakes-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Main Gear Steering Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<property>controls/gear/maingear-steering-cmd-norm</property>
+					<value>-20</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/MainGearSteering-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Left Gear Retraction Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>gear/gear[1]/position-norm</property>
+					<property>controls/gear/gear-down</property>
+				</greater-than>
+			</condition>
+			<value>-850</value>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/LeftGearRetraction-demand-set</output>
+	</filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>100</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/Demand/LeftGearRetraction-demand-set</input>
+		<output>systems/hydraulics/system[1]/Demand/LeftGearRetraction-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Right Gear Retraction Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>gear/gear[2]/position-norm</property>
+					<property>controls/gear/gear-down</property>
+				</greater-than>
+			</condition>
+			<value>-850</value>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/RightGearRetraction-demand-set</output>
+	</filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>100</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/Demand/RightGearRetraction-demand-set</input>
+		<output>systems/hydraulics/system[1]/Demand/RightGearRetraction-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Flaps Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<condition>
+				<not-equals>
+					<property>surface-positions/flap-pos-norm</property>
+					<property>controls/flight/flaps</property>
+				</not-equals>
+			</condition>
+			<value>-200</value>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/Flaps-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center Flight Control Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs type="double">0.2</update-interval-secs>
+		<input>
+			<expression>
+				<prod>
+					<sum>
+						<abs><property>surface-positions/elevator-trim-tab-pos-norm</property></abs>
+						<abs><property>surface-positions/left-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/right-aileron-pos-norm</property></abs>
+						<abs><property>surface-positions/rudder-pos-norm</property></abs>
+						<abs><property>surface-positions/speedbrake-pos-norm</property></abs>
+					</sum>
+					<value>-100</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/Fltctrl-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System Nose Leak Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[1]/Demand/Nose-Leak</property>
+					<value>0.0</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/Demand/Nose-Leak</property>
+					<value>-200</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/Nose-Leak-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1 Leak Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[1]/Demand/C1-Leak</property>
+					<value>0.0</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/Demand/C1-Leak</property>
+					<value>-200</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/C1-Leak-demand-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C2 Leak Demand Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[1]/Demand/C2-Leak</property>
+					<value>0.0</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<prod>
+					<property>systems/hydraulics/system[1]/Demand/C2-Leak</property>
+					<value>-200</value>
+				</prod>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/Demand/C2-Leak-demand-psi</output>
+	</filter>
+
+	<filter>
+		<name>Center System Nose Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<and>
+					<equals>
+						<property>systems/hydraulics/system[1]/IslnValve[0]/opened</property>
+						<value>1.0</value>
+					</equals>
+					<equals>
+						<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+						<value>1.0</value>
+					</equals>
+				</and>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<and>
+					<equals>
+						<property>systems/hydraulics/system[1]/IslnValve[0]/opened</property>
+						<value>1.0</value>
+					</equals>
+					<not-equals>
+						<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+						<value>1.0</value>
+					</not-equals>
+				</and>
+			</condition>
+			<expression>
+				<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+			</expression>
+		</input>
+		<input>
+			<value>0.0</value>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalPumpPress-Nose-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1 Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<not-equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</not-equals>
+			</condition>
+			<expression>
+				<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+			</expression>
+		</input>
+		<input>
+			<value>0.0</value>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalPumpPress-C1-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C2 Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<not-equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</not-equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<value>0.0</value>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalPumpPress-C2-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System Fltctrl Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[4]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<not-equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</not-equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[4]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>
+			<value>0.0</value>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalPumpPress-Fltctrl-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1C2 Combined Pump Pressure</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property>
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalPumpPress-psi</output>
+	</filter>	
+	
+	<filter>
+		<name>Center System Nose Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/Demand/NoseGearSteering-demand-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/NoseGearRetraction-demand-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalDemandPress-Nose-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1 Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[0]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-Nose-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/ReserveBrakes-demand-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<input>systems/hydraulics/system[1]/Demand/ReserveBrakes-demand-psi</input>
+		<output>systems/hydraulics/system[1]/TotalDemandPress-C1-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C2 Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/Demand/Flaps-demand-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/MainGearSteering-demand-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/LeftGearRetraction-demand-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/RightGearRetraction-demand-psi</property>
+					<property>systems/hydraulics/system[1]/Demand/Fltctrl-demand-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalDemandPress-C2-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System Combined Pressure Demand</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-C1-psi</property>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-C2-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/TotalDemandPress-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1C2 Total Pressure Difference</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/TotalPumpPress-psi</property>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/PressDiff-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C1 Total Pressure Difference</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/TotalPumpPress-C1-psi</property>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-C1-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/PressDiff-C1-psi</output>
+	</filter>
+	
+	<filter>
+		<name>Center System C2 Total Pressure Difference</name>
+		<type>gain</type>
+		<gain>1.0</gain>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<expression>
+				<sum>
+					<property>systems/hydraulics/system[1]/TotalPumpPress-C2-psi</property>
+					<property>systems/hydraulics/system[1]/TotalDemandPress-C2-psi</property>
+				</sum>
+			</expression>
+		</input>
+		<output>systems/hydraulics/system[1]/PressDiff-C2-psi</output>
+	</filter>
+	
+	<filter>
+        <name>Hydraulic C system pressure</name> 
+		<!-- If the center isolation valve is closed, C2 pressure is shown on the hyd display-->
+		<!-- Pressure is measured at the pump with the highest pressure output-->
+        <type>gain</type>
+        <update-interval-secs type="double">0.2</update-interval-secs>
+        <gain>1.0</gain>
+        <input>
+			<condition>
+				<and>
+					<equals>
+						<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+						<value>1.0</value>
+					</equals>
+					<greater-than>
+						<property>systems/hydraulics/system[1]/PressDiff-psi</property>
+						<value>2500</value>
+					</greater-than>
+				</and>
+			</condition>
+			<expression>
+				<max> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>systems/hydraulics/system[1]/m-pump[0]/press-psi</property> <!-- C1 Elec pump pressure -->
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property> <!-- C1 Air pump pressure -->
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property> <!-- C2 Elec pump pressure -->
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property> <!-- C2 Air pump pressure -->
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+        </input>
+		<input>
+			<condition>
+				<equals>
+					<property>systems/hydraulics/system[1]/IslnValve[1]/opened</property>
+					<value>1.0</value>
+				</equals>
+			</condition>
+			<expression>
+				<max>
+					<property>systems/hydraulics/system[1]/PressDiff-psi</property>
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+		</input>
+		<input>
+			<condition>
+				<greater-than>
+					<property>systems/hydraulics/system[1]/PressDiff-C2-psi</property>
+					<value>2500</value>
+				</greater-than>
+			</condition>
+			<expression>
+				<max> <!-- Pressure is determined by pump that delivers highest pressure-->
+					<property>systems/hydraulics/system[1]/m-pump[1]/press-psi</property> <!-- C1 Air pump pressure -->
+					<property>systems/hydraulics/system[1]/m-pump[2]/press-psi</property> <!-- C2 Elec pump pressure -->
+					<property>systems/hydraulics/system[1]/m-pump[3]/press-psi</property> <!-- C2 Air pump pressure -->
+					<property>environment/pressure-psi</property> <!-- Outside air pressure (for when no pumps are running) -->
+				</max>
+			</expression>
+		</input>
+		<input>systems/hydraulics/system[1]/PressDiff-C2-psi</input>
+        <output>systems/hydraulics/system[1]/press-set</output>
+    </filter>
+	
+	<filter>
+		<type>noise-spike</type>
+		<update-interval-secs>0.2</update-interval-secs>
+		<max-rate-of-change>500</max-rate-of-change>
+		<input>systems/hydraulics/system[1]/press-set</input>
+		<output>systems/hydraulics/system[1]/press-psi</output>
+	</filter>
+	
+	<!-- Hydraulic system pressure warnsystem logic -->
+	
+	<logic>
+		<name>Press Sys L</name>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<less-than>
+				<property>systems/hydraulics/system[0]/press-psi</property>
+				<value>2500</value>
+			</less-than>
+		</input>
+		<output>
+			<property>systems/hydraulics/warnsystem/PressSysLeft</property>
+		</output>
+	</logic>
+	
+	<logic>
+		<name>Press Sys C</name>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<less-than>
+				<property>systems/hydraulics/system[1]/press-psi</property>
+				<value>2500</value>
+			</less-than>
+		</input>
+		<output>
+			<property>systems/hydraulics/warnsystem/PressSysCenter</property>
+		</output>
+	</logic>
+	
+	<logic>
+		<name>Press Sys R</name>
+		<update-interval-secs>0.2</update-interval-secs>
+		<input>
+			<less-than>
+				<property>systems/hydraulics/system[2]/press-psi</property>
+				<value>2500</value>
+			</less-than>
+		</input>
+		<output>
+			<property>systems/hydraulics/warnsystem/PressSysRight</property>
+		</output>
+	</logic>
+	
+	
+
+</PropertyList>
